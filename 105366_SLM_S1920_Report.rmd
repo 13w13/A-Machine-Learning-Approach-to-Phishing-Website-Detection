@@ -1,0 +1,682 @@
+---
+title: ' Phishing Websites Detector'
+author: "Simon Weiss - 105366"
+date: "22/05/2020"
+output:
+  html_document
+---
+# Navigation{.tabset .tabset-fade .tabset-pills}
+
+## 1.Introduction
+
+### What is Phishing? 
+
+
+As COVID-19 spreads around the world, it is clear that the use of the web and online services is accelerating, confirming the importance of this new technology in our modern world. 
+
+In a March [letter on emergency preparedness in the context of Covid](https://www.bankingsupervision.europa.eu/press/letterstobanks/shared/pdf/2020/ssm.2020_letter_on_Contingency_preparedness_in_the_context_of_COVID-19.en.pdf?d1c8dc2780e2055243778bedf818efeb), the European Central Bank warns that the number of cyberthreats has increased dramatically and stresses that the time has come to "assessing risks of increased cyber security related fraud, aimed both to customers or to the institution via phishing mails, etc."
+
+One of the most widely recognized online security dangers is **Phishing attack**. The purpose of this fraud is to **imitate a real website**, for example, internet banking, e-eCommerce, or social networking so as to acquire confidential data such as user-names, passwords, financial and health-related information from potential victims.
+
+![What is Phishing ? ](C:/Users/swp/Documents/Cours/Warsaw/Statistical Learning Methods/0.Project/105366_SLM_S1920_Report/img/Pishing1.jpg)
+   
+***
+  
+### Website Phishing
+Phishing sites are crafted to lure users into thinking they are on a legitimate website. The goal of a website Phishing is thus to appear as **credible as possible** so that it is indistinguishable from legitimate websites. 
+
+The coarser website phishing will have a distinctive visual sign of the legitimate site as the example below of an Amazon login page. The most successful ones are only recognizable by other characteristics of their own web page, such as the url address, which will not correspond to the server of the legitimate site. 
+     
+![An Amazon Pishing website (coarser) ?](C:/Users/swp/Documents/Cours/Warsaw/Statistical Learning Methods/0.Project/105366_SLM_S1920_Report/img/Pishing2.png)
+     
+***
+    
+    
+### Uci Dataset
+
+It is in this context that we will use the database built by professors Mohammad Rami, McCluskey T.L. of University of Huddersfield and Thabtah Fadi of the Canadian University of Duba and published on the famous [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Phishing+Websites).    
+The database is a collection of website URLs for 11055 websites.    
+Each sample has 30 website parameters (features) that have proved to be sound and effective in predicting phishing websites and a Result label(target) identifying it as a phishing website or not (respectively -1 or 1).
+
+***
+### Problem description
+Our problem is thus a **supervised binary classification problem**. We will divide our dataset into a train and a test samples so as to train models on the dataset and find which models will give us simply  the best accuracy score in detecting if a website is a phishing one or not. 
+
+***
+
+### Description of the features in dataset
+
+
+The categories features in our database are divided into **4 main groups**.    
+
+* Address Bar based Features
+* Abnormal Based Features
+* HTML and JavaScript based Features
+* Domain based Features
+
+
+For each feature described below, the variable construction value followed a rule if else and took either value 1,-1,or 0. 0 is when a feature is considered SUSPICIOUS that means it can be either phishy or legitimate.    
+
+Let us describe the features of the first categorie used by following  the feature descriptions provided by the authors of the dataset. 
+
+**Address Bar based Features**
+
++ Using the IP Address : If an IP address is used as an alternative of the domain name in the URL, the feature takes the value -1 and 1 otherwise.  
++ Long URL to Hide the Suspicious Part : Phishers can use long URL to hide the doubtful part in the address bar. The builders of the dataset     calculated the length of URLs in the dataset and produced an average URL length. The results showed that if the length of the URL is greater than or equal 54 characters then the URL classified as phishing. If the URL is between 54 and 74, it is classed as suspicious (0). >54 => 1.   
++	Using URL Shortening Services "TinyURL" : if this service is used, the feature takes the value of -1, 1 otherwise.   
++ URL's having "@" Symbol : Using "@" symbol in the URL leads the browser to ignore everything preceding the "@" symbol and the real address often follows the "@" symbol. The feature takes thus -1 if there is a @, 1 otherwise.   
++ Redirecting using "//" : The existence of "//" within the URL path means that the user will be redirected to another website. The builders of the dataset found that if the position of "//" within the URL is over 7, the feature takes the value -1.   
++ Adding Prefix or Suffix Separated by (-) to the Domain : The dash symbol is rarely used in legitimate URLs. Phishers tend to add prefixes or suffixes separated by (-) to the domain name so that users feel that they are dealing with a legitimate webpage.   
++ Sub Domain and Multi Sub Domains : If the number of dots is greater than one, then the URL is classified as "Suspicious" since it has one sub domain. However, if the dots are greater than two, it is classified as "Phishing" since it will have multiple sub domains. Otherwise, if the URL has no sub domains, it will be assigned as "Legitimate" to the feature.   
++ HTTPS (Hyper Text Transfer Protocol with Secure Sockets Layer) : The existence of HTTPS is very important in giving the impression of website legitimacy, but this is clearly not enough. The authors checked the certificate assigned with HTTPS including the extent of the trust certificate issuer, and the certificate age. If the certificate is trusted and if the age of the certificate is under 1 year, the feature takes the value 1. 
++ Domain Registration Length : Based on the fact that a phishing website lives for a short period of time, the authors found that the longest fraudulent domains have been used for one year only. 
++ Favicon : A favicon is a graphic image (icon) associated with a specific webpage. If the favicon is loaded from a domain other than that shown in the address bar, then the webpage is likely to be considered a Phishing attempt. 
++ Using Non-Standard Port : This feature is useful in validating if a particular service (e.g. HTTP) is up or down on a specific server. Several firewalls, Proxy and Network Address Translation (NAT) servers will, by default, block all or most of the ports and only open the ones selected. If all ports are open, phishers can run almost any service they want and as a result, user information is threatened. 
++ The Existence of "HTTPS" Token in the Domain Part of the URL : The phishers may add the "HTTPS" token to the domain part of a URL in order to trick users.
+    
+
+We hope, that thanks to this part, the reader will better understand the database we use here.      
+In order not to add too much information in this notebook, since a comprehension of the variables requires a particular technical explanation, we redirect the reader to the [complete descrption](https://archive.ics.uci.edu/ml/datasets/Phishing+Websites#) provided by the authors. 
+
+***
+
+### Overview of the project
+
+In order to address the problem described in point 1.4,, I have implemented 3 main types classification algorithms(Trees Classifier, Logistic Regression, Neural Networks).  First, we will process the data and do some EDA. Then we will create models and tun our hyperparamter and then we will assess our models and compare it in order to find the best models. From all the models developed , Boosted Tree model has highest accuracy and is  followed by Random Forest Classifier and Logistic Regression. So, according to our project, boosted tree would best predict if a website is a phishing website or not.
+
+Have a good reading ! 
+
+   
+***
+
+## 2. Data processing
+
+#### Load library
+```{r message=FALSE, warning=FALSE}
+library(RWeka)
+library(BCA)
+library(car)
+library(xgboost)
+library(ggplot2)
+library(randomForest)
+library(DataExplorer)
+library(caret)
+library(tree)
+library(extraTrees)
+library(xgboost)
+library(h2o)
+library(nnet)
+library(corrplot)
+library(Hmisc)
+library(rpart)
+library(plyr)
+library(DT)
+```
+#### Load dataset
+```{r warning=FALSE, collapse=TRUE}
+dataset <-read.arff(url("https://archive.ics.uci.edu/ml/machine-learning-databases/00327/Training%20Dataset.arff"))
+head(dataset)
+str(dataset)
+datatable(dataset, filter = 'top',options = list())
+```
+
+```{r warning=FALSE, collapse=TRUE}
+plot_intro(dataset)
+```
+    
+Like we introduced in 1.5, all our variables are categorical variable and discrete variable. Our dataset has 31 columns and 11,055 lines. 
+
+   
+***
+  
+#### Rename column
+For sake of simplicity, we rename our columns by removing the spaces in their names and homogenizing them. 
+
+```{r warning=FALSE, collapse=TRUE}
+colnames(dataset)
+```
+```{r warning=FALSE, collapse=TRUE}
+cols<-c("HavingIP","LongURL","ShortURL","Symbol","ddRedirecting","PrefixSuffix","SubDomain","HTTPS","DomainRegLen","Favicon","Port","HTTPsToken","RequestURL","AnchorURL", "LinksInTag","SFH","SubEmail","AbnormalURL","Redirect","OnMouseover","RightClick","PopUp","Iframe","AgeOfDomain","DNSRecord","WebTraffic","PageRank","GoogleIndex","LinkToPage","StatsReport","Class")
+names(dataset)<-cols
+colnames(dataset)
+```
+   
+***
+  
+Let us first check if there is any missing value in our dataset.  
+
+#### Missing Values ? 
+
+```{r warning=FALSE, collapse=TRUE}
+introduce(dataset)
+```
+There is no Missing Value. 
+   
+***
+  
+#### Unbalanced dataset ? 
+```{r warning=FALSE, collapse=TRUE}
+table(dataset$Class)
+prop.table(table(dataset$Class))
+```
+The balance of the classes is not bad. We will not have to implement method to deal with imbalanced dataset like SMOTE. 
+
+   
+***
+  
+### Feature selection ? 
+We will see in our third part and with our first trees the importance of variables in our prediction models. We can firstly notice here that this dataset has been build intentionally with features which collectively contribute to deciding if a website is phishing or not. Thus, feature selection will probably not be mandatory. 
+
+
+## 3. Exploratory Data Analysis
+
+### Correlation analysis
+
+```{r warning=FALSE, collapse=TRUE}
+corr<-rcorr(as.matrix(dataset))
+dataset_coeff = corr$r
+
+corrplot(dataset_coeff, method="square",type="upper", order="hclust", tl.col="black", tl.srt=45)
+```
+
+```{r warning=FALSE, collapse=TRUE}
+sort(dataset_coeff[,31],decreasing= TRUE )
+```
+We use the first graph and the attached table to identify the variables most correlated with the target. 
+
+Although we can notice that some features are highly correlated with each other (>0.5), we choose to keep them for more precision in our model.    
+   
+We observe that the variables **HTTPS** and **AnchorULR** are most the correlated to the target.   
+Let us plot distribution of Class for the most correlated features to the the target (HTTPS, AnchorURL,PrefixSuffix). 
+
+***
+
+
+### Bar plots
+
+
+#### Bar plot for HTTPS by Class
+
+```{r warning=FALSE, collapse=TRUE}
+qplot(HTTPS, data=dataset, geom="bar", fill=Class) + 
+  theme(legend.position = "top") + 
+  theme(axis.text.x=element_text(angle = -20, hjust = 0))
+```
+
+We can see from this graph that the distribution of classes follows a fairly good logic : Phishing Website fall mainly into suspicious website according to Using https and Issuer characteristic. However, we can notice that a small proportion of e phishing website are legitimate according to this feature (i.e. there is fortunately work for our models ! ). Finally, we can describe that all suspicious HTTPS (0) were Phishing Website (class -1)
+
+Let us analyse what happens for our second most correlated features to target AnchorURL. 
+
+***
+  
+#### Bar plot for AnchorURL by Class
+
+```{r warning=FALSE, collapse=TRUE}
+qplot(AnchorURL, data=dataset, geom="bar", fill=Class) + 
+  theme(legend.position = "top") + 
+  theme(axis.text.x=element_text(angle = -20, hjust = 0))
+```
+   
+The distribution of Class follows mainly the same rules as before. We can notice that the sites considered as phishing according to the feature are all phishing. A small number of legitimate sites are misclassified with this variable. 
+The vast majority of sites that are considered suspicious according to the feature are **legitimate sites** (unlike the feature HTTPS)
+
+
+***
+
+#### 2 Bar plots for PrefixSuffix and WebTraffic
+
+
+```{r warning=FALSE, collapse=TRUE}
+
+qplot(PrefixSuffix, data=dataset, geom="bar", fill=Class) + 
+  theme(legend.position = "top")
+qplot(WebTraffic, data=dataset, geom="bar", fill=Class) + 
+  theme(legend.position = "top")
+```
+  
+***
+
+#### Bar plots for DomainRegLen
+
+What happens for feature the least correlated to target variable ? 
+Let us plot bar plot for DomainRegLen feature. 
+```{r warning=FALSE, collapse=TRUE}
+qplot(DomainRegLen, data=dataset, geom="bar", fill=Class) + 
+  theme(legend.position = "top")
+```
+
+As we could have expected, we can here notice that there is a majority of missclaffication according to this feature : -1 Class are classed 1 in the feature and reciprocally.    
+
+Now that we have described the relation between feature and target variable, let us plot conclude this EDA part by plotting all variables distribution into bar plot in order to see globally the behavior of our variables. 
+ 
+***
+
+#### Plotting Variable frequency.  
+
+```{r warning=FALSE, collapse=TRUE}
+plot_bar(dataset)
+```
+
+This ends our EDA part. We can move to our 4rd part : building models. 
+
+***
+
+## 4. Building models
+
+### Prepare final dataset
+Now that we have passed our first 3 parts, let's build our databases to build our models. 
+
+
+### Recode Target variable 
+In case of parameterized models, negative label values can make models uneasy. To resolve this problem I converted the -1 values to 0.
+```{r warning=FALSE, collapse=TRUE}
+dataset <- within(dataset, {
+  Class <- Recode(Class, '-1=0', as.factor=TRUE)
+})
+
+```
+
+
+### Split data
+```{r warning=FALSE, collapse=TRUE}
+dataset$Sample <- create.samples(dataset, est = 0.70, val = 0.30, rand.seed = 1)
+trainingset<-dataset[dataset$Sample=="Estimation",]
+testset<-dataset[dataset$Sample=="Validation",]
+trainingset<-trainingset[,-32]
+testset<-testset[,-32]
+
+
+```
+
+
+
+### Tree models
+
+#### Tree 1 : Classification Tree
+Let us build our first classification tree using **tree package**. 
+
+```{r collapse=TRUE, warning=FALSE}
+tree1.train <-  tree(Class~.,data=trainingset)
+
+summary(tree1.train)
+```
+Our first tree reveals the importance of 4 variables in the prediction of our target. HTPS, AnchorURL and WebTraffic were, as we saw previously, the 3 variables the most correlated to the our target class. LinksInTag is also important in the prediction here. 
+
+
+
+Let us plot our first tree ...
+
+```{r collapse=TRUE, warning=FALSE}
+plot(tree1.train)
+text(tree1.train,pretty = 0)
+
+```
+    
+... and apply our model into test dataset. 
+
+
+```{r collapse=TRUE, warning=FALSE}
+tree1.predict<-predict(tree1.train, newdata=testset[,-31], type="class")
+```
+
+Now that we have applied our model, we will plot confusion Matrix and simply use Accuracy score to assess model performance. 
+
+
+```{r collapse=TRUE, warning=FALSE}
+
+c1<-confusionMatrix(factor(tree1.predict),factor(testset$Class))
+c1
+```
+
+Let us use **cross-validation** to prune the tree optimally. We run a K-fold cross-validation using cv.tree experiment to find the deviance or the number of misclassifications as a function of the cost-complexity parameter k.   
+
+
+```{r collapse=TRUE, warning=FALSE}
+tree1.val <-  tree(Class~.,data=trainingset)
+cv.val1.tree = cv.tree(tree1.val, FUN = prune.tree,K=10)
+plot(cv.val1.tree)
+
+```
+    
+We can observe that we have a big drop between 1 and 2 of the deviance. 
+We will pick size 4. 
+
+```{r collapse=TRUE, warning=FALSE}
+tree1_optimal = prune.tree(tree1.train, best=4)
+summary(tree1_optimal)
+summary(tree1.train)
+plot(tree1_optimal)
+text(tree1_optimal, pretty=0)
+
+```
+
+
+```{r collapse=TRUE, warning=FALSE}
+
+tree1.predict_optimal<-predict(tree1_optimal, newdata=testset[,-31], type="class")
+c1<-confusionMatrix(factor(tree1.predict_optimal),factor(testset$Class))
+c1
+
+
+```
+    
+We can observe an increase in our accuracy thank to this pruning !  
+Let us build a second tree and compare its accuracy score.   
+
+***
+
+#### Tree 2 : CART tree
+
+Let us use CART algorithm with **rpart package**. 
+The CART splits variable for classification by minimizing a homogeneity measure (Gini index or entrepoy). 
+Here, we will use Gini index and will start with a complexity parameter (cp) to 0.
+
+
+```{r collapse=TRUE, warning=FALSE}
+
+tree2.train = rpart(Class~., data=trainingset,cp=0)
+plot(tree2.train)
+text(tree2.train,pretty=0)
+
+```
+    
+This first graph is quite unreadable.   
+This can be explained by the fact that rpart integrates all the variables in its model, unlike the previous tree.   
+  
+  
+```{r collapse=TRUE, warning=FALSE}
+tree2.train$cptable
+```
+   
+Here we can see complexity parameter which goes down with the number of splits n. We will look relative error : first value here is 1. Every next value is compared after this relative error.   
+Xerror : cross validation error of multiple train test.    
+xstd : standard variation.    
+
+Our task here is to pick the lowest cp with the lowest relative error.
+```{r collapse=TRUE, warning=FALSE}
+plotcp(tree2.train)
+```
+    
+A good choice of cp for pruning is often the leftmost value for which the mean lies below the horizontal line.
+
+
+
+```{r collapse=TRUE, warning=FALSE}
+cp_tree2.train = tree2.train$cptable[which(tree2.train$cptable[,"xerror"]==min(tree2.train$cptable[,"xerror"])),"CP"]
+cp_tree2.train
+```
+
+```{r collapse=TRUE, warning=FALSE}
+tree2=rpart(Class~., data=trainingset)
+tree2_optimal = prune(tree2, cp=cp_tree2.train)
+
+tree2.predict<-predict(tree2_optimal, newdata=testset[,-31], type="class")
+
+c2<-confusionMatrix(factor(tree2.predict),factor(testset$Class))
+c2
+```
+From our second matrix confusion, we can observe a very slight improvement in our accuracy score. 
+
+
+*** 
+
+### Other Tree models
+
+#### Tree 3: Random Forest
+
+Random Forest reduces the variance of forecasts in a decision tree alone, thus improving performance. It does this by combining n decision trees in a **bagging approach**. We don't prune the tree. 
+
+Each tree in the random forest is trained on a **random subset** of data. The predictions are then averaged.
+
+
+```{r collapse=TRUE, warning=FALSE}
+tree3.train = randomForest(Class~., data=trainingset, ntree=1000, do.trace=T)
+varImpPlot(tree3.train) 
+plot(tree3.train)
+```
+   
+
+Let us apply our model which reduces variance of forecast with averaged predictions from generated subset trees on test dataset.  
+
+```{r collapse=TRUE, warning=FALSE}
+tree3.predict = predict(tree3.train,newdata=testset[,-31],type="class")
+c3<-confusionMatrix(factor(tree3.predict),factor(testset$Class))
+c3
+```
+
+We have here an accuracy score of 0.96 which is way better than previous ! Let us compare it with one final tree model.    
+
+***
+
+
+#### Tree 4 : Boosted Tree
+
+Finally, last tree here is Boosted Tree aka XGBoost. 
+XGBoost is a well-known and efficient open source implementation of the improved **gradient tree algorithm**.    
+Gradient boosting is a supervised learning algorithm, which attempts to accurately predict a **target variable** by combining estimates from a simpler and weaker set of models. GBoost reduces a regularized objective function (L1 and L2) that combines a convex loss function (based on the difference between predicted and target outputs) and a penalty condition for model complexity (in other words, regression tree functions).    
+Training continues **iteratively**, adding new trees that predict residuals or errors from previous trees that are then combined with the previous trees to make the final prediction.   
+
+In other words we are building a tree and looks **which value is predicted poorly** and assign to it higher **weigh** in our prediction.      
+
+
+Let us build and predict our model with **1000 maximum** number of boosting iterations. 
+```{r collapse=TRUE, warning=FALSE}
+
+tree4.train = xgboost::xgboost(data=data.matrix(trainingset[,-31]),label=as.numeric(as.character(trainingset$Class)),nrounds=1000,params=list(booster="gbtree", eta=0.10, max_depth = 3, objective="binary:logistic",subsample = 0.50, colsample_bytree=0.50))
+
+tree4.predict = predict(tree4.train, newdata=data.matrix(trainingset[,-31]),type="class")
+
+tree4.predict<-round(tree4.predict,0)
+c4<-confusionMatrix(factor(tree4.predict),factor(trainingset$Class))
+c4
+
+```
+Our latest model has the highest accaracy score <0.97.  Let's see if other model categories can do better ! 
+   
+
+***
+  
+
+### Regression model
+
+First let's recall that regression model uses a **linear** combination of the predictors 
+
+$$
+\eta({\bf x}) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \ldots  + \beta_{p - 1} x_{p - 1}
+$$
+Like ordinary linear regression,we will run glm model and perform common hypothesis testing like the Wald-test using P-value. 
+
+$$
+H_0: \beta_j = 0 \quad \text{vs} \quad H_1: \beta_j \neq 0
+$$
+
+
+
+```{r warning=FALSE, collapse=TRUE}
+GLM <- glm(Class ~.,family=binomial(logit), data=trainingset)
+summary(GLM)
+1 - (GLM$deviance/GLM$null.deviance) 
+```
+The results begin by reporting the distribution of residuals.    
+The table of **"coefficients"** presents the results of our regression analysis. We are particularly interested in columns 1, 2 and 5: the **variable name**, **the regression coefficient** of the variable, and whether the **coefficient is significantly different from zero**. 
+
+Instead of removing by hand variable wich are above 0.05 threshold, we use Stepvise Variable Selection so as to determine the set of variables that results with the minimum AIC and compare it with the variable underlined with decision tree. 
+```{r warning=FALSE, collapse=TRUE}
+WES.STEP <- step(GLM, direction="both", k=1)
+summary(WES.STEP)
+1 - (WES.STEP$deviance/WES.STEP$null.deviance) # McFadden R^2
+```
+
+And we apply our regression model into our test data. 
+
+```{r collapse=TRUE, warning=FALSE}
+
+predict1_reg <- predict(WES.STEP,newdata=testset[,-31],type="response")
+head(predict1_reg)
+```
+
+
+The object predict1.reg is a vector that holds the predicted Wesbrook outcomes in the test data. The values are probabilities between 0 to 1 (due to the argument type='response'). 
+
+Let us change the probability into categorical values between 0 to 1. 
+
+```{r collapse=TRUE, warning=FALSE}
+predict1_reg<-ifelse(predict1_reg>0.5, 1, 0)
+head(predict1_reg)
+```
+
+$$
+\hat{C}(x) = 
+\begin{cases} 
+      1 & \hat{p}(x) > 0.5 \\
+      0 & \hat{p}(x) \leq 0.5 
+\end{cases}
+$$
+
+```{r collapse=TRUE, warning=FALSE}
+c5<-confusionMatrix(factor(predict1_reg),factor(testset$Class))
+c5
+```
+We can notice that our regression model has good results and can compete with tree accuracy scores. 
+
+***
+
+
+
+### Neural Network 
+
+Neural network consists of a collection of elements that are highly interconnected and change a set of inputs to a set of desired outputs. The result of the change is dictated by the characteristics of the elements and  the weights associated with the interconnections among them. A neural network  directs an analysis of the information and provides a probability estimate that it  matches with the data it has been trained to recognize. The neural system picks up the experience by training the system with both the input and output of the  desired problem. The network configuration is refined until satisfactory results are  obtained. The neural network gains experience over a period as it is being trained on the data related to the problem. 
+
+
+
+#### Model 6 : Neural network with H2o
+
+We use here a famous R package **H2o** in order to build a neuron model network. 
+
+Let us first initiate the environment of H2o and build some dataset. 
+
+```{r, collapse=TRUE, warning=TRUE}
+h2o.init()
+```
+
+```{r, collapse=TRUE, warning=TRUE}
+h2o.train <- as.h2o(trainingset)
+```
+
+
+```{r, collapse=TRUE, warning=TRUE}
+h2o.test <- as.h2o(testset)
+
+```
+
+Let us build our model with described parameters. 
+
+```{r, collapse=TRUE, warning=TRUE}
+
+h2o.model <-  h2o.deeplearning(x = setdiff(names(trainingset), c("Class")),
+                              y = "Class",
+                              training_frame = h2o.train,
+                              standardize = TRUE,         # standardize data
+                              hidden = c(100, 100,100),  # 3 layers of 100 nodes each
+                              rate = 0.01,                # learning rate
+                              epochs = 1000,                # iterations/runs over data (we choose a high number of runs in purpose since we want our model to be competitive in front of tree classification)
+                              seed = 1234                 # reproducability seed
+                              )
+
+```
+
+
+And apply our model to our test dataset. 
+
+```{r, collapse=TRUE, warning=TRUE}
+h2o.prediction <- as.data.frame(h2o.predict(h2o.model, h2o.test))
+
+
+c6<-confusionMatrix(factor(h2o.prediction$predict),factor(testset$Class))
+c6
+
+```
+
+***
+
+
+#### Model 7 : Neural Network with NNet 
+```{r, collapse=TRUE, warning=TRUE}
+
+model_nnet<-nnet(Class ~. , data=trainingset,size=10, maxit = 500)
+pred_nnet <- predict(model_nnet, testset[,-31],type = "class")
+
+c7<-confusionMatrix(factor(pred_nnet),factor(testset$Class))
+c7
+```
+
+
+
+
+
+
+
+  
+## 5. Model assessment
+    
+Let us plot all our confusion matrix in order to choose the best model. 
+```{r, collapse=TRUE, warning=TRUE}
+c1
+c2
+c3
+c4
+c5
+c6
+c7
+```
+   
+Since we have chosen to use a simple metric to evolve our model as our dataset was balanced, we will not use ROC curve or AIC but simply keep the best model accuracy. From above confusion matrix, we can class our models by performance into following order : first comes Boosted Tree, then RandomForest, and Neural Network models. Regression model provided better accuracy than our two first classification trees. 
+
+*** 
+  
+## 6. Summary and Future Work
+
+Although the performance of our seven different machine learning methods used is quite comparable, we found that Boosed  Trees model achieved  
+the best results. We have found that a simple regression method can sometimes be better than certain types of trees when it comes to classification and that neural networks achieve competitive results.  Our results demonstrate the potential of using learning machines in detecting and classifying phishing website.   
+
+
+One interesting future development would be to build an online Website Phishing Detector into a Web-Application using those models 
+with Rshiny.    
+
+Here an example found of such a website and some screenshots of it. 
+https://malicious-url-detectorv5.herokuapp.com/    
+
+![Homepage - An Example of Phishing Dectector Web-Application ](C:/Users/swp/Documents/Cours/Warsaw/Statistical Learning Methods/0.Project/105366_SLM_S1920_Report/img/Phishing3.png)
+
+     
+![Malicious Website - An Example of Phishing Dectector Web-Application](C:/Users/swp/Documents/Cours/Warsaw/Statistical Learning Methods/0.Project/105366_SLM_S1920_Report/img/Phishing4.png)
+     
+Building such an application would to be very interesting because it would make it possible to use model in practical cases and validate our conclusion regarding model performance score  with new input data. 
+I began to do some research in order to develop such a website that and I propose here identified major steps to implement that. 
+
+- Within A RShiny script
+- Use web-scrapper R package "rves". 
+- Extract all wanted information include in our 30 features. 
+- Build function if else based on the rules used to build the dataset.
+like this python script : https://github.com/srimani-programmer/Phishing-URL-Detector/blob/master/feature_extraction.py
+- https://phishtank.com/index.php provides url of detected phishing dataset to feed our models.  
+- Once our dataset is rebuilt Use our models to predict if the input url is phishing or not and print accuracy score. 
+
+- Show results on a r hiny server web-page. 
+
+  
+***
+
+## Acknowledgements and references
+
+The following is a list of helpful contributor.
+
+- Dr Jaroslaw Jozef Olejniczak- Big Data - SGH Spring 2020   
+- Professor Lukasz Krainski- Statistical Learning Methods [223490-0286] - Summer semester 2019/20 
+- Github  https://github.com/srimani-programmer/Phishing-URL-Detector/blob/master/feature_extraction.py 
+- Another example using webscrapper https://medium.com/swlh/supervised-learning-to-detect-phishing-urls-d0779d360dc8 
+- Using project framework of https://medium.com/intel-student-ambassadors/using-ai-for-managing-renewable-energy-generation-and-management-c7be86cde760 
+- Stack Overflow community
+
+
+Thank you for reading ! 
