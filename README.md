@@ -1,6 +1,6 @@
-# A-Machine-Learning-Approach-to-Phishing-Website-Detection
-author: "Simon Weiss - 105366"   
-date: "22/05/2020"   
+# A-Machine-Learning-Approach-to-Phishing-Website-Detection  
+Simon Weiss - 105366  
+date: 22/05/2020
 ---
 ## 1.Introduction
 
