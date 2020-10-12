@@ -1,6 +1,4 @@
 # A-Machine-Learning-Approach-to-Phishing-Website-Detection
----
-title: ' Phishing Websites Detector'   
 author: "Simon Weiss - 105366"   
 date: "22/05/2020"   
 ---
