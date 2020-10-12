@@ -1,4 +1,4 @@
-# U3_Msc-AI-and-BA_A_Shiny_App_for_the_Millenium_Development_Goals 
+# A-Machine-Learning-Approach-to-Phishing-Website-Detection
 Simon Weiss - 105366   
 22/05/2020
 
@@ -25,4 +25,38 @@ One of the most widely recognized online security dangers is **Phishing attack**
 Phishing sites are crafted to lure users into thinking they are on a legitimate website. The goal of a website Phishing is thus to appear as **credible as possible** so that it is indistinguishable from legitimate websites. 
 
 The coarser website phishing will have a distinctive visual sign of the legitimate site as the example below of an Amazon login page. The most successful ones are only recognizable by other characteristics of their own web page, such as the url address, which will not correspond to the server of the legitimate site. 
-     
+
+***
+    
+    
+### Uci Dataset
+
+It is in this context that we will use the database built by professors Mohammad Rami, McCluskey T.L. of University of Huddersfield and Thabtah Fadi of the Canadian University of Duba and published on the famous [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Phishing+Websites).    
+The database is a collection of website URLs for 11055 websites.    
+Each sample has 30 website parameters (features) that have proved to be sound and effective in predicting phishing websites and a Result label(target) identifying it as a phishing website or not (respectively -1 or 1).
+
+***
+### Problem description
+Our problem is thus a **supervised binary classification problem**. We will divide our dataset into a train and a test samples so as to train models on the dataset and find which models will give us simply  the best accuracy score in detecting if a website is a phishing one or not. 
+
+***
+
+### Description of the features in dataset
+
+
+The categories features in our database are divided into **4 main groups**.    
+
+* Address Bar based Features
+* Abnormal Based Features
+* HTML and JavaScript based Features
+* Domain based Features
+
+
+***
+
+### Overview of the project
+
+In order to address the problem described in point 1.4,, I have implemented 3 main types classification algorithms(Trees Classifier, Logistic Regression, Neural Networks).  First, we will process the data and do some EDA. Then we will create models and tun our hyperparamter and then we will assess our models and compare it in order to find the best models. From all the models developed , Boosted Tree model has highest accuracy and is  followed by Random Forest Classifier and Logistic Regression. So, according to our project, boosted tree would best predict if a website is a phishing website or not.
+
+Have a good reading ! 
+
