@@ -1,8 +1,8 @@
 # A-Machine-Learning-Approach-to-Phishing-Website-Detection
 ---
-title: ' Phishing Websites Detector'
-author: "Simon Weiss - 105366"
-date: "22/05/2020"
+title: ' Phishing Websites Detector'   
+author: "Simon Weiss - 105366"   
+date: "22/05/2020"   
 ---
 # Navigation{.tabset .tabset-fade .tabset-pills}
 
