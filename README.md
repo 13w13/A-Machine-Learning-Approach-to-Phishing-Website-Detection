@@ -2,8 +2,6 @@
 author: "Simon Weiss - 105366"   
 date: "22/05/2020"   
 ---
-# Navigation{.tabset .tabset-fade .tabset-pills}
-
 ## 1.Introduction
 
 ### What is Phishing? 
